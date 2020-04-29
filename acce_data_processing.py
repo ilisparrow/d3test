@@ -43,11 +43,12 @@ def sglProcessing(_sgl,_smoothingWindow=300):
     return npAccZFiltered    
 
 
-def writToFile(_isOn, _newStampTime):#Writes into a CSV file in the same folder as the script
+def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the same folder as the script
     try:
 
         df = pd.DataFrame(data=_newStampTime, columns=["date"])
         df['value'] = _isOn
+        df['localSum'] = _localSum
         dir_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = os.path.join(dir_path, "export_dataframe.csv") 
         df.to_csv (dir_path, index = False, header=True)
@@ -76,6 +77,7 @@ if  loaded :#Checks if the file was loaded correctly
     lengthInMinutes = ((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
 
     totalTime = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
+    localSum = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
     newStampTime = []#Init. of the new time timestamp array, that has a one minute interval between measure (extrapolated)
 
 
@@ -83,8 +85,12 @@ if  loaded :#Checks if the file was loaded correctly
     for i in range(int(lengthInMinutes)):
         totalTime[i] = boolArray[math.floor(len(boolArray)*(i/lengthInMinutes))]#Extrapolates if it's a one or a zero .
         newStampTime.append((timeStamp[0]+ timedelta(seconds=60)*i))#generates the new time stamps
-    
-    writToFile(totalTime,newStampTime)#Calls the write to a file function
+        try:
+            localSum[i]=totalTime[i]+localSum[i-1] 
+        except:
+            pass
+
+    writToFile(totalTime,newStampTime,localSum)#Calls the write to a file function
     plt.plot(totalTime)
     plt.show()
     print(str(sum(totalTime)//60)+"h")

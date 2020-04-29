@@ -20,7 +20,7 @@
 <script>
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
+    width = 1700 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -33,11 +33,14 @@ var svg = d3.select("#my_dataviz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+//d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
 
   // When reading the csv, I must format variables:
   function(d){
-    return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+    //2020-04-28 00:00:14.853,0.0
+    //yyyy-mm-dd hh:MM:ss:mlml,value
+    return { date : d3.timeParse("%Y-%m-%d %H:%M:%S.%L")(d.date), value : d.value }
   },
 
   // Now I can use this dataset:
@@ -86,7 +89,7 @@ d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_data
     area.append("path")
       .datum(data)
       .attr("class", "myArea")  // I add the class myArea to be able to modify it later on.
-      .attr("fill", "#69b3a2")
+      .attr("fill", "#99FF33")
       .attr("fill-opacity", .3)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
