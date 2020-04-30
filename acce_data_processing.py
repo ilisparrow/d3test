@@ -12,11 +12,14 @@ import matplotlib.pyplot as plt
 
 debug = False;
 
+
+
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
     try :   
         csvFile = pd.read_csv(_name) 
         print("Succesfully loaded the file")
         timeStamp =pd.to_datetime(csvFile['created'])#TO CHECK : The current csv file has this category to store the time of the log
+        timeStamp =pd.to_datetime(timeStamp.dt.strftime("%Y-%m-%d %H:%M:%S"))#TO CHECK : The current csv file has this category to store the time of the log
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
         if (debug):
             plt.plot(npAccZ)
@@ -39,7 +42,7 @@ def sglProcessing(_sgl,_smoothingWindow=300):
         plt.plot(npAccCentered)
         plt.show()
     
-    npAccZqrd = np.square(npAccCentered)#it's the equivalent of the absolut value (to make all of the data positiv
+    npAccZqrd = np.square(npAccCentered)#it's the equivalent of the absolut value (to make all of the data positive
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
@@ -70,15 +73,18 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 #                   Main code starts here                                   #
 #                                                                           #
 #############################################################################
+if(debug):
+    startTime = time.time()
 
-#startTime = time.time()
-smoothingWindow = 30#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
-threshHold = 200#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
-loaded,data,timeStamp = loadFile('./tmp/data.csv')
+loaded,data,timeStamp = loadFile('./data.csv')
+smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
+print()
 
 if  loaded :#Checks if the file was loaded correctly
     processed = sglProcessing(data, smoothingWindow)#Calls the processing function
     resizedTimeStamp = timeStamp[smoothingWindow-1:]#Calculates the size of the array after the filter is applied
+    threshHold = np.mean(processed)*0.8
     boolArray = (processed>threshHold)*1#Applies the threshold, and transforms it into 1 & 0
         
 
@@ -103,7 +109,8 @@ if  loaded :#Checks if the file was loaded correctly
         plt.plot(totalTime)
         plt.show()
         print(str(sum(totalTime)//60)+"h")
-    #print(startTime -time.time())
+        print(startTime -time.time())
+    
     
 
 

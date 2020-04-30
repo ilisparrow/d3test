@@ -32,6 +32,8 @@
 
 
 <script>
+  //d3.csv('http://localhost:3000/process', function (data) {
+
   d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv", function (data) {
     var fruits = data[data.length - 1].localSum;
     d3.select('h4').selectAll().data(fruits).enter().append().text(function (d) {
@@ -40,17 +42,10 @@
   })
 </script>
 <script>
-  var request = new XMLHttpRequest()
-  request.open('GET', 'http://localhost:3000/', true)
-
-  request.onload = function () {}
-  request.send()
-</script>
 
 
 
 
-<script>
   // set the dimensions and margins of the graph
   var margin = {
       top: 10,
@@ -71,21 +66,31 @@
       "translate(" + margin.left + "," + margin.top + ")");
 
   //Read the data
-  //d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
-  d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
+  d3.csv('http://localhost:3000/process',
+  //d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
 
     // When reading the csv, I must format variables:
     function (d) {
       //2020-04-28 00:00:14.853,0.0
       //yyyy-mm-dd hh:MM:ss:mlml,value
       return {
-        date: d3.timeParse("%Y-%m-%d %H:%M:%S.%L")(d.date),
+        date: d3.timeParse("%Y-%m-%d %H:%M:%S")(d.date),
         value: d.value
       }
     },
 
     // Now I can use this dataset:
     function (data) {
+
+
+
+
+
+
+
+
+
+
 
       // Add X axis --> it is a date format
       var x = d3.scaleTime()

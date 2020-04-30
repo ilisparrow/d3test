@@ -77,7 +77,7 @@ let processdata = async function (filename, _callback) {
           console.error(err)
           return
         }
-        _callback(await neatCsv(data));
+        _callback(await data);
       })
       
     });
@@ -101,7 +101,7 @@ let start = async function (req, res) {
 
 app.get('/process', start);
 
-app.get('/test', function (req, res) {
+app.get('/', function (req, res) {
   //Executong the python script
   console.log('get');
   const spawn = require('child_process').spawn;
