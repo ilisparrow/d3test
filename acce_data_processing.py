@@ -76,7 +76,7 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 if(debug):
     startTime = time.time()
 
-loaded,data,timeStamp = loadFile('./data.csv')
+loaded,data,timeStamp = loadFile('./tmp/data.csv')
 smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
 print()
