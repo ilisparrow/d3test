@@ -74,7 +74,7 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 #startTime = time.time()
 smoothingWindow = 30#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 threshHold = 200#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
-loaded,data,timeStamp = loadFile('28042020.csv')
+loaded,data,timeStamp = loadFile('./tmp/data.csv')
 
 if  loaded :#Checks if the file was loaded correctly
     processed = sglProcessing(data, smoothingWindow)#Calls the processing function

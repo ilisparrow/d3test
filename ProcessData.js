@@ -7,7 +7,7 @@ const {
   Parser
 } = require('json2csv');
 const fs = require('fs-extra')
-
+const neatCsv = require('neat-csv');
 
 
 const fields = ['id', 'device', 'accX', 'accY', 'accZ', 'millis', 'created'];
@@ -64,25 +64,23 @@ let doconnection = async function (device) {
 }
 
 // process and send the data back
-let processdata = async function (filename) {
+let processdata = async function (filename, _callback) {
   console.log('**processdata');
   const spawn = require('child_process').spawn;
-  const process = spawn('python', ['./acce_data_processing.py ' + filename]);
-  console.log('processing....');
 
-  return new Promise((resolve, reject) => {
-
+    const process = spawn('python', ['./acce_data_processing.py']);
+    console.log('processing....');
     process.stdout.on('data', datao => {
 
-      let data = fs.readFileSync(filename, {
-        throws: true
-      });
-      console.log(datao.toString());
-      console.log("Data processed succesfully");
-
-      resolve(data);
+      fs.readFile('./export_dataframe.csv', async (err, data) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        _callback(await neatCsv(data));
+      })
+      
     });
-  });
 }
 
 let start = async function (req, res) {
@@ -91,8 +89,9 @@ let start = async function (req, res) {
 
   try {
     let filename = await doconnection(device);
-    let data = await processdata(filename);
-    res.send(data);
+    processdata(filename, function(data, error) {
+      res.send(data);  
+    });
 
   } catch (err) {
     res.send(err);
@@ -106,7 +105,7 @@ app.get('/test', function (req, res) {
   //Executong the python script
   console.log('get');
   const spawn = require('child_process').spawn;
-  const process = spawn('python', ['./acce_data_processing.py tmp/data.csv']);
+  const process = spawn('python', ['./acce_data_processing.py', './tmp/data.csv']);
   console.log('processing....');
   process.stdout.on('data', data => {
     console.log(data.toString());
