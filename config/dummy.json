@@ -1,0 +1,7 @@
+{
+    "server":"",
+    "user":"",
+    "password":"",
+    "database":"",
+    "encrypt": true
+}
