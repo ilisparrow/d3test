@@ -10,14 +10,17 @@ import time
 import matplotlib.pyplot as plt
 #'''
 
+debug = False;
+
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
     try :   
         csvFile = pd.read_csv(_name) 
-        print("succesfully loaded the file")
+        print("Succesfully loaded the file")
         timeStamp =pd.to_datetime(csvFile['created'])#TO CHECK : The current csv file has this category to store the time of the log
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
-        plt.plot(npAccZ)
-        plt.show()
+        if (debug):
+            plt.plot(npAccZ)
+            plt.show()
         return True,npAccZ,timeStamp
     except:
         print("Failed to load the input file")
@@ -31,15 +34,19 @@ def movingAverage(_a, _n=300) :
 def sglProcessing(_sgl,_smoothingWindow=300):
 
     npAccCentered = _sgl-np.mean(_sgl)#Centers the data around 0
-    plt.plot(npAccCentered)
-    plt.show()
+
+    if (debug):
+        plt.plot(npAccCentered)
+        plt.show()
     
     npAccZqrd = np.square(npAccCentered)#it's the equivalent of the absolut value (to make all of the data positiv
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
-    plt.plot(npAccZFiltered)
-    plt.show()
+    if (debug):
+        plt.plot(npAccZFiltered)
+        plt.show()
+
     return npAccZFiltered    
 
 
@@ -52,8 +59,9 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
         dir_path = os.path.dirname(os.path.realpath(__file__))
         dir_path = os.path.join(dir_path, "export_dataframe.csv") 
         df.to_csv (dir_path, index = False, header=True)
-        print(df.tail())
-        print("File saved")
+        if (debug):
+            print(df.tail())
+        print("Succesfully saved the processed file")
     except:
         print("Failed to save the CSV file")
 
@@ -91,9 +99,10 @@ if  loaded :#Checks if the file was loaded correctly
             pass
 
     writToFile(totalTime,newStampTime,localSum)#Calls the write to a file function
-    plt.plot(totalTime)
-    plt.show()
-    print(str(sum(totalTime)//60)+"h")
+    if (debug):
+        plt.plot(totalTime)
+        plt.show()
+        print(str(sum(totalTime)//60)+"h")
     #print(startTime -time.time())
     
 

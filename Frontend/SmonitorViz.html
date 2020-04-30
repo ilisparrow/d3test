@@ -1,18 +1,45 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
 <meta charset="utf-8">
+<style>
+h4 { 
+    display: inline;
+    font-size: 0.9em;
+    margin-top: -1.91em;
+    margin-bottom: -1.91em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+
+}
+</style>
+
+
+
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 
+
+<H1>S-Monitor dashboard</H1>
 <!-- Create a div where the graph will take place -->
+
 <div id="my_dataviz"></div>
+<div class="progress"></div>
+<h4>The machine was running for a total of: </h4><h4> minutes</h4>
 
 
 
+<script>  d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",  function(data){var fruits = data[data.length-1].localSum;   d3.select('h4')        .selectAll()        .data(fruits)        .enter()        .append()        .text(function(d) { return d; })})
 
-
-
+</script>
+	<script>
+		var request = new XMLHttpRequest()
+		request.open('GET','http://localhost:3000/', true)
+		
+		request.onload = function(){}
+		request.send()
+	</script>
 
 
 
@@ -90,7 +117,7 @@ d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_datafr
       .datum(data)
       .attr("class", "myArea")  // I add the class myArea to be able to modify it later on.
       .attr("fill", "#99FF33")
-      .attr("fill-opacity", .3)
+      .attr("fill-opacity", .99)
       .attr("stroke", "black")
       .attr("stroke-width", 1)
       .attr("d", areaGenerator )
