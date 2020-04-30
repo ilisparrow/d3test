@@ -28,10 +28,18 @@ let doconnection = async function (device) {
   try {
     // make sure that any items are correctly URL encoded in the connection string
 
-
+    let query = `SELECT [id],[device],[accX],[accY],[accZ],[millis],[created],[gyX],[gyY],[gyZ]
+    ,[magX],[magY],[magZ],[yaw],[pitch],[roll],[temp] FROM [iot].[pilot_fish] 
+    where [device] = '${device}' 
+    and created >= '2020-04-27 00:00:00' 
+    and created < '2020-04-28 00:00:00'
+    order by millis`;
 
     await sql.connect(config);
-    const result = await sql.query `select top 100 * from [iot].[pilot_fish]`; // where [device] = '${device}'`
+
+    const result = await sql.query(query);
+
+    //`select top 100 * from [iot].[pilot_fish]`; // where [device] = '${device}'`
     //    console.log(result)
 
     if (result && result.recordsets && result.recordsets[0]) {
@@ -78,7 +86,9 @@ let processdata = async function (filename) {
 }
 
 let start = async function (req, res) {
-  let device = req.query.device || 'pilot01';
+
+  let device = req.query.device || 'pilot02';
+
   try {
     let filename = await doconnection(device);
     let data = await processdata(filename);
@@ -88,6 +98,7 @@ let start = async function (req, res) {
     res.send(err);
   }
 }
+
 
 app.get('/process', start);
 
