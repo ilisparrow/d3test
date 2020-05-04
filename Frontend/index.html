@@ -2,7 +2,16 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-  h4 {
+   h3 {
+    display: inline;
+    font-size: 0.9em;
+    margin-top: -1.91em;
+    margin-bottom: -1.91em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+   }
+   h4 {
     display: inline;
     font-size: 0.9em;
     margin-top: -1.91em;
@@ -19,10 +28,18 @@
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
+<!-- Load bootstrap -->
+
+
 
 
 <H1>S-Monitor dashboard</H1>
 <!-- Create a div where the graph will take place -->
+</p>
+<h3>Please select a time span : </h3>
+</p>
+<h3>From</h3><input type="date" id="startingDate" value="2020-04-20"><h3>to</h3><input type="date" id="endingDate" value="2020-04-21">
+<button onclick="myFunction()">Plot</button>
 
 <div id="my_dataviz"></div>
 <div class="progress"></div>
@@ -45,6 +62,179 @@
 
 
 
+myFunction_();
+
+
+
+function myFunction() {
+  var starting = document.getElementById("startingDate").value;
+  var ending = document.getElementById("endingDate").value;
+  console.log(starting)
+
+d3.selectAll('svg').remove();
+    // set the dimensions and margins of the graph
+  var margin = {
+      top: 10,
+      right: 30,
+      bottom: 30,
+      left: 60
+    },
+    width = 1700 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3.select("#my_dataviz")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")");
+  //Read the data
+
+
+
+
+  d3.csv('http://localhost:3000/process/'+starting+'_'+ending,
+  //d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
+
+    // When reading the csv, I must format variables:
+    function (d) {
+      //2020-04-28 00:00:14.853,0.0
+      //yyyy-mm-dd hh:MM:ss:mlml,value
+      return {
+        date: d3.timeParse("%Y-%m-%d %H:%M:%S")(d.date),
+        value: d.value
+      }
+    },
+
+    // Now I can use this dataset:
+    function (data) {
+
+
+      // Add X axis --> it is a date format
+      var x = d3.scaleTime()
+        .domain(d3.extent(data, function (d) {
+          return d.date;
+        }))
+        .range([0, width]);
+      xAxis = svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+      // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function (d) {
+          return +d.value;
+        })])
+        .range([height, 0]);
+      yAxis = svg.append("g")
+        .call(d3.axisLeft(y));
+      
+      var clip = svg.append("defs").append("svg:clipPath").attr("fill","#eb4034")
+      // Add a clipPath: everything out of this area won't be drawn.
+      var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0);
+
+      // Add brushing
+      var brush = d3.brushX() // Add the brush feature using the d3.brush function
+        .extent([
+          [0, 0],
+          [width, height]
+        ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+        .on("end", updateChart) // Each time the brush selection changes, trigger the 'updateChart' function
+
+      // Create the area variable: where both the area and the brush take place
+      var area = svg.append('g')
+        .attr("clip-path", "url(#clip)")
+
+      // Create an area generator
+      var areaGenerator = d3.area()
+        .x(function (d) {
+          return x(d.date)
+        })
+        .y0(y(0))
+        .y1(function (d) {
+          return y(d.value)
+        })
+
+      area.append("path").datum(data).exit().remove()
+      console.log(area.append("path").exit())
+      // Add the area
+      area.append("path")
+        .datum(data)
+        .attr("class", "myArea") // I add the class myArea to be able to modify it later on.
+        .attr("fill", "#33ccff")
+        .attr("fill-opacity", .99)
+        .attr("stroke", "black")
+        .attr("stroke-width", 1)
+        .attr("d", areaGenerator)
+      // Add the brushing
+      area
+        .append("g")
+        .attr("class", "brush")
+        .call(brush);
+
+      // A function that set idleTimeOut to null
+      var idleTimeout
+
+      function idled() {
+        idleTimeout = null;
+      }
+
+      // A function that update the chart for given boundaries
+      function updateChart() {
+
+        // What are the selected boundaries?
+        extent = d3.event.selection
+
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if (!extent) {
+          if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+          x.domain([4, 8])
+        } else {
+          x.domain([x.invert(extent[0]), x.invert(extent[1])])
+          area.select(".brush").call(brush.move,
+            null) // This remove the grey brush area as soon as the selection has been done
+        }
+
+        // Update axis and area position
+        xAxis.transition().duration(1000).call(d3.axisBottom(x))
+        area
+          .select('.myArea')
+          .transition()
+          .duration(1000)
+          .attr("d", areaGenerator)
+      }
+
+      // If user double click, reinitialize the chart
+      svg.on("dblclick", function () {
+        x.domain(d3.extent(data, function (d) {
+          return d.date;
+        }))
+        xAxis.transition().call(d3.axisBottom(x))
+        area
+          .select('.myArea')
+          .transition()
+          .attr("d", areaGenerator)
+      });
+
+    })}
+
+
+
+function myFunction_() {
+  var starting = document.getElementById("startingDate").value;
+  var ending = document.getElementById("endingDate").value;
+  console.log(starting)
+
+
+
 
   // set the dimensions and margins of the graph
   var margin = {
@@ -64,9 +254,12 @@
     .append("g")
     .attr("transform",
       "translate(" + margin.left + "," + margin.top + ")");
-
   //Read the data
-  d3.csv('http://localhost:3000/process',
+
+
+
+
+  d3.csv('http://localhost:3000/process/'+starting+'_'+ending,
   //d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
 
     // When reading the csv, I must format variables:
@@ -81,15 +274,6 @@
 
     // Now I can use this dataset:
     function (data) {
-
-
-
-
-
-
-
-
-
 
 
       // Add X axis --> it is a date format
@@ -146,7 +330,7 @@
       area.append("path")
         .datum(data)
         .attr("class", "myArea") // I add the class myArea to be able to modify it later on.
-        .attr("fill", "#99FF33")
+        .attr("fill", "#33ccff")
         .attr("fill-opacity", .99)
         .attr("stroke", "black")
         .attr("stroke-width", 1)
@@ -202,5 +386,5 @@
           .attr("d", areaGenerator)
       });
 
-    })
+    })}
 </script>

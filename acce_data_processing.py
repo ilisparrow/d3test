@@ -89,7 +89,7 @@ if  loaded :#Checks if the file was loaded correctly
         
 
     lengthInMinutes = ((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
-
+    print(timeStamp)
     totalTime = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
     localSum = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
     newStampTime = []#Init. of the new time timestamp array, that has a one minute interval between measure (extrapolated)
