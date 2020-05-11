@@ -77,19 +77,19 @@ if(debug):
     startTime = time.time()
 
 loaded,data,timeStamp = loadFile('./tmp/data.csv')
-smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+#smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+smoothingWindow =300#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
 print()
 
 if  loaded :#Checks if the file was loaded correctly
     processed = sglProcessing(data, smoothingWindow)#Calls the processing function
     resizedTimeStamp = timeStamp[smoothingWindow-1:]#Calculates the size of the array after the filter is applied
-    threshHold = np.mean(processed)*0.8
+    #threshHold = np.mean(processed)*0.8
     boolArray = (processed>threshHold)*1#Applies the threshold, and transforms it into 1 & 0
         
 
     lengthInMinutes = ((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
-    print(timeStamp)
     totalTime = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
     localSum = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
     newStampTime = []#Init. of the new time timestamp array, that has a one minute interval between measure (extrapolated)

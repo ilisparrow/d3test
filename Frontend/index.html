@@ -1,5 +1,15 @@
 <!-- Code from d3-graph-gallery.com -->
 <!DOCTYPE html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>S-Monitor dashboard</title>
+  </head>
 <meta charset="utf-8">
 <style>
    h3 {
@@ -29,35 +39,44 @@
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
 <!-- Load bootstrap -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
 
-
-
+<body>
 <H1>S-Monitor dashboard</H1>
 <!-- Create a div where the graph will take place -->
 </p>
 <h3>Please select a time span : </h3>
 </p>
-<h3>From</h3><input type="date" id="startingDate" value="2020-04-20"><h3>to</h3><input type="date" id="endingDate" value="2020-04-21">
-<button onclick="myFunction()">Plot</button>
+<h3>From : </h3><input type="date" id="startingDate" value="2020-04-20" class="input-group-text"><h3>to : </h3><input type="date" id="endingDate" value="2020-04-21" class="input-group-text">
+</p>
+<button onclick="myFunction()" class="btn btn-dark">Plot</button>
 
 <div id="my_dataviz"></div>
 <div class="progress"></div>
-<h4>The machine was running for a total of: </h4>
+<h4>The machine was running for a total of: </h4><h4 id="runningTime"></h4>
 <h4> minutes</h4>
 
 
-
+<!--
 <script>
-  //d3.csv('http://localhost:3000/process', function (data) {
+//  d3.csv('http://localhost:3000/process', function (data) {
 
-  d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv", function (data) {
+
+
+  var starting = document.getElementById("startingDate").value;
+  var ending = document.getElementById("endingDate").value;
+
+  d3.csv('http://localhost:3000/process/'+starting+'_'+ending, function (data) {
     var fruits = data[data.length - 1].localSum;
     d3.select('h4').selectAll().data(fruits).enter().append().text(function (d) {
       return d;
     })
   })
 </script>
+-->
 <script>
 
 
@@ -98,10 +117,14 @@ d3.selectAll('svg').remove();
   d3.csv('http://localhost:3000/process/'+starting+'_'+ending,
   //d3.csv("https://raw.githubusercontent.com/ilisparrow/d3test/master/export_dataframe.csv",
 
+
+
+  
     // When reading the csv, I must format variables:
     function (d) {
       //2020-04-28 00:00:14.853,0.0
       //yyyy-mm-dd hh:MM:ss:mlml,value
+      document.getElementById("runningTime").innerHTML = d.localSum;  
       return {
         date: d3.timeParse("%Y-%m-%d %H:%M:%S")(d.date),
         value: d.value
@@ -111,6 +134,9 @@ d3.selectAll('svg').remove();
     // Now I can use this dataset:
     function (data) {
 
+
+
+    
 
       // Add X axis --> it is a date format
       var x = d3.scaleTime()
@@ -266,14 +292,22 @@ function myFunction_() {
     function (d) {
       //2020-04-28 00:00:14.853,0.0
       //yyyy-mm-dd hh:MM:ss:mlml,value
+      
+    
+    document.getElementById("runningTime").innerHTML = d.localSum;  
       return {
         date: d3.timeParse("%Y-%m-%d %H:%M:%S")(d.date),
         value: d.value
+        
       }
     },
 
     // Now I can use this dataset:
     function (data) {
+
+
+      
+
 
 
       // Add X axis --> it is a date format
@@ -388,3 +422,4 @@ function myFunction_() {
 
     })}
 </script>
+</body>
