@@ -78,7 +78,7 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 def clustering(_smoothingWindow,_raw):
 
     
-    _raw = _raw[:500]#Calls the processing function#FOR DEBUG, SINGAL WHEN, THESE IS DATA FROM WHEN THE MACHINE IS NOT RUNNNING
+    #_raw = _raw[:500]#Calls the processing function#FOR DEBUG, SINGAL WHEN, THESE IS DATA FROM WHEN THE MACHINE IS NOT RUNNNING
     X = sglProcessing(_raw, _smoothingWindow)#Calls the processing function
 
     X = np.reshape(X, (-1, 1))
@@ -184,7 +184,7 @@ if  loaded :#Checks if the file was loaded correctly
     #OBS : IT doesn't work for only off machine, if the filtering window is not put to 300 (the singal is too noisy, and the algorithm thinks that there are two catogires
     
     #TODO : Change the Filter for something smarter
-
+    #TODO : forgot :/ 
     #TODO : Not fit(x) eveyrthime we have a request, but do it once, as setup procedure (an automatic one), then just "predict"
 
     
