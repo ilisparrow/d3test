@@ -10,7 +10,7 @@ import time
 import matplotlib.pyplot as plt
 #'''
 
-debug = False;
+debug = True;
 
 
 
@@ -80,12 +80,28 @@ loaded,data,timeStamp = loadFile('./tmp/data.csv')
 #smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 smoothingWindow =300#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values
-print()
 
 if  loaded :#Checks if the file was loaded correctly
     processed = sglProcessing(data, smoothingWindow)#Calls the processing function
     resizedTimeStamp = timeStamp[smoothingWindow-1:]#Calculates the size of the array after the filter is applied
     #threshHold = np.mean(processed)*0.8
+
+
+
+    print("variance small batch : ",np.std(processed[:500]))
+    print("variance big batch : ",np.std(processed))
+    print("The median is :",np.quantile(processed,0.5))
+    threshHold = (np.quantile(processed,0.5)+np.mean(processed))/2
+    print("The mean is :",np.mean(processed))
+    print("The threshold is : ", threshHold)
+    plt.scatter(processed,processed)
+    #plt.hist(processed, bins=400)
+    plt.show()
+
+
+
+
+
     boolArray = (processed>threshHold)*1#Applies the threshold, and transforms it into 1 & 0
         
 
@@ -105,7 +121,7 @@ if  loaded :#Checks if the file was loaded correctly
             pass
 
     writToFile(totalTime,newStampTime,localSum)#Calls the write to a file function
-    if (debug):
+    if (True):
         plt.plot(totalTime)
         plt.show()
         print(str(sum(totalTime)//60)+"h")
