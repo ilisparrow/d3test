@@ -9,10 +9,11 @@ import os
 import time
 import matplotlib.pyplot as plt
 from sklearn.cluster import MeanShift, estimate_bandwidth
+from scipy import signal
 #'''
 
 debug = False;
-
+clusteringDebug = True
 
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
@@ -21,11 +22,20 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         print("Succesfully loaded the file")
         timeStamp =pd.to_datetime(csvFile['created'])#TO CHECK : The current csv file has this category to store the time of the log
         timeStamp =pd.to_datetime(timeStamp.dt.strftime("%Y-%m-%d %H:%M:%S"))#TO CHECK : The current csv file has this category to store the time of the log
+        print(csvFile.head())
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
+        npAccY = np.array(csvFile['accY'])#TO CHECK : The current csv file has this category to store the accel dat
+        npAccX = np.array(csvFile['accX'])#TO CHECK : The current csv file has this category to store the accel dat
+        threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
+
+        #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
+        
         if (debug):
+            plt.plot(threeAxisMerged)
+
             plt.plot(npAccZ)
             plt.show()
-        return True,npAccZ,timeStamp
+        return True,threeAxisMerged,timeStamp
     except:
         print("Failed to load the input file")
         return False,0,0
@@ -85,6 +95,7 @@ def clustering(_smoothingWindow,_raw):
     bandwidth = estimate_bandwidth(X, quantile=0.5,n_samples=500)
 
     ms = MeanShift( bin_seeding=True, bandwidth=bandwidth)
+    ms = MeanShift( bin_seeding=True)
     ms.fit(X)
     labels = ms.labels_
     cluster_centers = ms.cluster_centers_
@@ -95,13 +106,13 @@ def clustering(_smoothingWindow,_raw):
 
     boolArray = (np.invert(labels == labels[np.argmin(X)]))*1
 
-    if(debug):
+    if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
         print("Cluster centers : ", ms.cluster_centers_)
         plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1)
-        plt.plot(np.abs(X)/100)
+        plt.plot(X/50)
         plt.plot(boolArray*100)
-        plt.plot((X>2000)*100)
+        #plt.plot((X>2000)*100)
         plt.title("Filtered in blue, in Orange is the  clustured output")
         plt.show()
    
@@ -124,7 +135,7 @@ if(debug):
 
 loaded,data,timeStamp = loadFile('./tmp/data.csv')
 #smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
-smoothingWindow =35#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+smoothingWindow =50#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 #threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values !!!!!!!!!!!!!!IS OBSELETE, IT'S NOW DYNAMIC
 
 if  loaded :#Checks if the file was loaded correctly
