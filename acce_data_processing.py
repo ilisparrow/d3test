@@ -109,9 +109,9 @@ def clustering(_smoothingWindow,_raw):
     if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
         print("Cluster centers : ", ms.cluster_centers_)
-        plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1)
-        plt.plot(X/50)
-        plt.plot(boolArray*100)
+        plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1,color="gray")
+        plt.plot(X/50,color="orange")
+        plt.plot(boolArray*100,color="red")
         #plt.plot((X>2000)*100)
         plt.title("Filtered in blue, in Orange is the  clustured output")
         plt.show()
