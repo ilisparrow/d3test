@@ -13,6 +13,7 @@ from scipy import signal
 #'''
 
 debug = False;
+#debug = True;
 clusteringDebug = True
 
 
@@ -22,18 +23,22 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         print("Succesfully loaded the file")
         timeStamp =pd.to_datetime(csvFile['created'])#TO CHECK : The current csv file has this category to store the time of the log
         timeStamp =pd.to_datetime(timeStamp.dt.strftime("%Y-%m-%d %H:%M:%S"))#TO CHECK : The current csv file has this category to store the time of the log
-        print(csvFile.head())
+        print(csvFile)
+        
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccY = np.array(csvFile['accY'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccX = np.array(csvFile['accX'])#TO CHECK : The current csv file has this category to store the accel dat
-        threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
 
+        #npAccZ = npAccZ[np.logical_not(np.isnan(npAccZ))]
+        
+        #threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
+        threeAxisMerged = np.abs(npAccZ[:110000])
+        print(npAccZ.size)
         #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         
         if (debug):
             plt.plot(threeAxisMerged)
 
-            plt.plot(npAccZ)
             plt.show()
         return True,threeAxisMerged,timeStamp
     except:
@@ -56,7 +61,9 @@ def sglProcessing(_sgl,_smoothingWindow=300):
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
-    if (debug):
+    if (True):
+        plt.plot(npAccCentered)
+        plt.show()
         plt.plot(npAccZFiltered)
         plt.show()
 

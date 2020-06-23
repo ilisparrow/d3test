@@ -86,6 +86,7 @@ let processdata = async function (filename, _callback) {
 let start = async function (req, res) {
 
   let device = req.query.device || 'pilot02';
+  //let device = req.query.device || 'sphome';
 
   var data = req.params.data
   console.log(data)
