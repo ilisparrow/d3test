@@ -12,7 +12,7 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from scipy import signal
 #'''
 
-debug = False;
+debug = True;
 clusteringDebug = True
 
 
@@ -28,7 +28,12 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         npAccX = np.array(csvFile['accX'])#TO CHECK : The current csv file has this category to store the accel dat
         threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
 
-        #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
+        #threeAxisMerged = np.abs(npAccZ[37500:60000]) 
+        #threeAxisMerged = np.abs(npAccZ) 
+        threeAxisMerged = np.abs(npAccZ[:110000]) 
+        
+
+        threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         
         if (debug):
             plt.plot(threeAxisMerged)
@@ -52,7 +57,7 @@ def sglProcessing(_sgl,_smoothingWindow=300):
     if (debug):
         plt.plot(npAccCentered)
     
-    npAccZqrd =(np.square(npAccCentered))#it's the equivalent of the absolut value (to make all of the data positive
+    npAccZqrd =(np.abs(npAccCentered))#it's the equivalent of the absolut value (to make all of the data positive
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
@@ -60,7 +65,22 @@ def sglProcessing(_sgl,_smoothingWindow=300):
         plt.plot(npAccZFiltered)
         plt.show()
 
-    return npAccZFiltered    
+
+    #################
+    toReturn = np.zeros(10000)
+    i=0
+    win = int(np.size(npAccZFiltered)//10000)
+    while(i<10000):
+
+        toReturn[i] =np.mean(npAccZFiltered[i*win:(i+1)*win])
+        i+=1
+    plt.plot(toReturn)
+    plt.show()
+    return toReturn
+    #################
+    
+    
+    #return npAccZFiltered    
 
 
 def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the same folder as the script
@@ -105,13 +125,15 @@ def clustering(_smoothingWindow,_raw):
     
 
     boolArray = (np.invert(labels == labels[np.argmin(X)]))*1
+    boolArray = signal.medfilt(boolArray,9)
 
     if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
         print("Cluster centers : ", ms.cluster_centers_)
-        plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1,color="gray")
+        #Input singal
+        #plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1,color="gray")
         plt.plot(X/50,color="orange")
-        plt.plot(boolArray*100,color="red")
+        plt.plot(boolArray,color="red")
         #plt.plot((X>2000)*100)
         plt.title("Filtered in blue, in Orange is the  clustured output")
         plt.show()
