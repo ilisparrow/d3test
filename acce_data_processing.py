@@ -50,14 +50,6 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
             threeAxisMerged = np.abs(npAccY)
         elif varZ>varX and varZ >varY :
             threeAxisMerged = np.abs(npAccZ)
-        #npAccZ = npAccZ[np.logical_not(np.isnan(npAccZ))]
-        
-        #threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
-        #threeAxisMerged = np.abs(npAccZ[:110000])
-        #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
-        #threeAxisMerged = np.abs(npAccZ[37500:60000]) 
-        #threeAxisMerged = np.abs(npAccZ) 
-        #threeAxisMerged = np.abs(npAccZ) 
         
 
         threeAxisMerged = signal.medfilt(threeAxisMerged,3)
