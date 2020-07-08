@@ -14,13 +14,16 @@ from scipy import signal
 #'''
 
 debug = False;
-#debug = True;
-clusteringDebug = True
 clusteringDebug = False
+
+debug = True;
+clusteringDebug = True
 
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
-    print("aaaaaaaaaaaaaaaaaaaaa: ",sys.argv[1])
+
+    _name=sys.argv[1];
+    
     try :   
         csvFile = pd.read_csv(_name) 
         print("Succesfully loaded the file")
@@ -29,6 +32,10 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         print(csvFile)
         
             
+    except:
+        print("Failed to load the input file")
+        return False,0,0
+    try : 
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccY = np.array(csvFile['accY'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccX = np.array(csvFile['accX'])#TO CHECK : The current csv file has this category to store the accel dat
@@ -47,11 +54,10 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         
         #threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
         #threeAxisMerged = np.abs(npAccZ[:110000])
-        print(npAccZ.size)
         #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         #threeAxisMerged = np.abs(npAccZ[37500:60000]) 
         #threeAxisMerged = np.abs(npAccZ) 
-        threeAxisMerged = np.abs(npAccZ) 
+        #threeAxisMerged = np.abs(npAccZ) 
         
 
         threeAxisMerged = signal.medfilt(threeAxisMerged,3)
