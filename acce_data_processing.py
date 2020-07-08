@@ -15,14 +15,14 @@ from scipy import signal
 
 debug = False;
 clusteringDebug = False
-
+'''
 debug = True;
 clusteringDebug = True
-
+#'''
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
 
-    _name=sys.argv[1];
+    _name=str("./tmp/"+str(sys.argv[1]));
     
     try :   
         csvFile = pd.read_csv(_name) 
@@ -59,8 +59,10 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
 
             plt.show()
         return True,threeAxisMerged,timeStamp
-    except:
+
+    except Exception as e: 
         print("Failed to load the input file")
+        print(e)
         return False,0,0
     
 def movingAverage(_a, _n=300) :
@@ -112,20 +114,29 @@ def sglProcessing(_sgl,_smoothingWindow=300):
 
 
 def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the same folder as the script
+    
+    if True:
     try:
 
         df = pd.DataFrame(data=_newStampTime, columns=["date"])
         df['value'] = _isOn
         df['localSum'] = _localSum
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        dir_path = os.path.join(dir_path, "export_dataframe.csv") 
+        #dir_path = os.path.join(dir_path, "export_dataframe.csv") 
+        dir_path = os.path.join(dir_path,"out" ,str("out_"+str(sys.argv[1])))
+        
+        f = open(dir_path, "x") 
+        f.close()
+
         df.to_csv (dir_path, index = False, header=True)
         if (debug):
             #print(df.tail())
             pass
         print("Succesfully saved the processed file")
-    except:
+
+    except Exception as e: 
         print("Failed to save the CSV file")
+        print(e)
 
 
 
