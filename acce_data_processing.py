@@ -13,10 +13,10 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from scipy import signal
 #'''
 
-#debug = False;
-debug = True;
+debug = False;
+#debug = True;
 clusteringDebug = True
-#clusteringDebug = False
+clusteringDebug = False
 
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
