@@ -4,6 +4,7 @@ import datetime
 import math
 from datetime import timedelta  
 import os 
+import sys
 #'''
 #For developpement :
 import time
@@ -19,6 +20,7 @@ clusteringDebug = True
 
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
+    print("aaaaaaaaaaaaaaaaaaaaa: ",sys.argv[1])
     try :   
         csvFile = pd.read_csv(_name) 
         print("Succesfully loaded the file")
@@ -26,14 +28,25 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         timeStamp =pd.to_datetime(timeStamp.dt.strftime("%Y-%m-%d %H:%M:%S"))#TO CHECK : The current csv file has this category to store the time of the log
         print(csvFile)
         
+            
         npAccZ = np.array(csvFile['accZ'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccY = np.array(csvFile['accY'])#TO CHECK : The current csv file has this category to store the accel dat
         npAccX = np.array(csvFile['accX'])#TO CHECK : The current csv file has this category to store the accel dat
 
+        varX = np.var(npAccX)
+        varY = np.var(npAccY)
+        varZ = np.var(npAccZ)
+
+        if varX >varY and varX > varZ : 
+            threeAxisMerged = np.abs(npAccX) 
+        elif varY>varX and varY >varZ :
+            threeAxisMerged = np.abs(npAccY)
+        elif varZ>varX and varZ >varY :
+            threeAxisMerged = np.abs(npAccZ)
         #npAccZ = npAccZ[np.logical_not(np.isnan(npAccZ))]
         
         #threeAxisMerged = np.abs(npAccZ) + np.abs(npAccY) + np.abs(npAccX)
-        threeAxisMerged = np.abs(npAccZ[:110000])
+        #threeAxisMerged = np.abs(npAccZ[:110000])
         print(npAccZ.size)
         #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         #threeAxisMerged = np.abs(npAccZ[37500:60000]) 
@@ -196,7 +209,6 @@ if  loaded :#Checks if the file was loaded correctly
     plt.show()
     '''
 
-    #####TODO : CHeck if this flip s necessary : 
 
 
 
@@ -210,11 +222,11 @@ if  loaded :#Checks if the file was loaded correctly
     print("legth in seconds : ",lengthInMinutes)
 
     if(lengthInMinutes <0):
-        timeStamp = np.flip(timeStamp)
-        data = np.flip(data)
+        #timeStamp = np.flip(timeStamp)
+        #data = np.flip(data)
         print("flipped")
+        lengthInMinutes = int((timeStamp[0]-timeStamp[len(timeStamp)-1]).total_seconds()//60)#Calculates the interval in minutes
     
-    lengthInMinutes = int((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
     print("---"*10)
     print("legth in seconds : ",lengthInMinutes)
 
