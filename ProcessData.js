@@ -68,7 +68,8 @@ let processdata = async function (filename, _callback) {
   console.log('**processdata');
   const spawn = require('child_process').spawn;
 
-    const process = spawn('python', ['./acce_data_processing.py']);
+    //const process = spawn('python', ['./acce_data_processing.py']);
+    const process = spawn('python', ['./acce_data_processing.py', './tmp/data.csv']);
     console.log('processing....');
     process.stdout.on('data', datao => {
 
@@ -91,7 +92,7 @@ let start = async function (req, res) {
   var data = req.params.data
   console.log(data)
   data = data.split("_")
-
+/*
   try {
     let filename = await doconnection(device,data);
     processdata(filename, function(data, error) {
@@ -101,6 +102,7 @@ let start = async function (req, res) {
   } catch (err) {
     res.send(err);
   }
+  */
 }
 
 
