@@ -92,7 +92,7 @@ let start = async function (req, res) {
   var data = req.params.data
   console.log(data)
   data = data.split("_")
-/*
+
   try {
     let filename = await doconnection(device,data);
     processdata(filename, function(data, error) {
@@ -102,7 +102,7 @@ let start = async function (req, res) {
   } catch (err) {
     res.send(err);
   }
-  */
+  
 }
 
 
