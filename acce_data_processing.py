@@ -12,9 +12,10 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from scipy import signal
 #'''
 
-debug = False;
-#debug = True;
+#debug = False;
+debug = True;
 clusteringDebug = True
+#clusteringDebug = False
 
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
@@ -35,6 +36,12 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         threeAxisMerged = np.abs(npAccZ[:110000])
         print(npAccZ.size)
         #threeAxisMerged = signal.medfilt(threeAxisMerged,3)
+        #threeAxisMerged = np.abs(npAccZ[37500:60000]) 
+        #threeAxisMerged = np.abs(npAccZ) 
+        threeAxisMerged = np.abs(npAccZ) 
+        
+
+        threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         
         if (debug):
             plt.plot(threeAxisMerged)
@@ -57,17 +64,40 @@ def sglProcessing(_sgl,_smoothingWindow=300):
     if (debug):
         plt.plot(npAccCentered)
     
-    npAccZqrd =(np.square(npAccCentered))#it's the equivalent of the absolut value (to make all of the data positive
+    npAccZqrd =(np.abs(npAccCentered))#it's the equivalent of the absolut value (to make all of the data positive
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
-    if (True):
+    if (debug):
         plt.plot(npAccCentered)
         plt.show()
         plt.plot(npAccZFiltered)
         plt.show()
 
-    return npAccZFiltered    
+
+    #################
+    FINALARRAYSIZE = 5000
+    toReturn = np.zeros(FINALARRAYSIZE)
+
+    i=0
+    win = int(np.size(npAccZFiltered)//FINALARRAYSIZE)
+    if(np.size(npAccZFiltered)>FINALARRAYSIZE):
+        while(i<FINALARRAYSIZE):
+
+            #toReturn[i] =np.mean(npAccZFiltered[i*win:(i+1)*win])
+            toReturn[i] =(npAccZFiltered[int((i/FINALARRAYSIZE)*np.size(npAccZFiltered))])
+            i+=1
+        return toReturn
+
+    else:
+        return npAccZFiltered    
+    plt.plot(toReturn)
+    plt.title("RETURNED VALUES")
+    plt.show()
+    #################
+    
+    
+    #return npAccZFiltered    
 
 
 def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the same folder as the script
@@ -112,13 +142,15 @@ def clustering(_smoothingWindow,_raw):
     
 
     boolArray = (np.invert(labels == labels[np.argmin(X)]))*1
+    boolArray = signal.medfilt(boolArray,9)
 
     if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
         print("Cluster centers : ", ms.cluster_centers_)
-        plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1)
-        plt.plot(X/50)
-        plt.plot(boolArray*100)
+        #Input singal
+        #plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1,color="gray")
+        plt.plot(X/50,color="orange")
+        plt.plot(boolArray,color="red")
         #plt.plot((X>2000)*100)
         plt.title("Filtered in blue, in Orange is the  clustured output")
         plt.show()
@@ -164,18 +196,34 @@ if  loaded :#Checks if the file was loaded correctly
     plt.show()
     '''
 
+    #####TODO : CHeck if this flip s necessary : 
 
 
 
+
+    
+
+    lengthInMinutes = int((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
+    
+    print(timeStamp[len(timeStamp)-1])
+    print(timeStamp[0])
+    print("legth in seconds : ",lengthInMinutes)
+
+    if(lengthInMinutes <0):
+        timeStamp = np.flip(timeStamp)
+        data = np.flip(data)
+        print("flipped")
+    
+    lengthInMinutes = int((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
+    print("---"*10)
+    print("legth in seconds : ",lengthInMinutes)
 
 
     boolArray = ((clustering(smoothingWindow,data)>=1)*1)#Gets the output from the cluster, and makes sure that it's a boolean array (even if the clustering gave 3 clusters)
-    
 
-
-    lengthInMinutes = ((timeStamp[len(timeStamp)-1]-timeStamp[0]).total_seconds()//60)#Calculates the interval in minutes
+    print("length in minutes : ",lengthInMinutes)
     totalTime = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
-    localSum = np.zeros(int(lengthInMinutes))#Init of the array that will store the the 0s and 1 and will be summed up
+    localSum = np.zeros(np.abs(int(lengthInMinutes)))#Init of the array that will store the the 0s and 1 and will be summed up
     newStampTime = []#Init. of the new time timestamp array, that has a one minute interval between measure (extrapolated)
 
 
@@ -188,6 +236,9 @@ if  loaded :#Checks if the file was loaded correctly
         except:
             pass
 
+    
+    totalTime = signal.medfilt(totalTime,3)
+    
     writToFile(totalTime,newStampTime,localSum)#Calls the write to a file function
     if (debug):
         plt.plot(totalTime)
