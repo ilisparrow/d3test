@@ -22,7 +22,7 @@ clusteringDebug = True
 
 def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array of the data, timestamp : array of when the measures where taken, it has the same size as data]
 
-    _name=str("./tmp/"+str(sys.argv[1]));
+    _name=str(sys.argv[1]);
     
     try :   
         csvFile = pd.read_csv(_name) 
@@ -126,7 +126,8 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
         df['localSum'] = _localSum
         dir_path = os.path.dirname(os.path.realpath(__file__))
         #dir_path = os.path.join(dir_path, "export_dataframe.csv") 
-        dir_path = os.path.join(dir_path,"out" ,str("out_"+str(sys.argv[1])))
+        dir_path = os.path.join(dir_path,str(sys.argv[1].split("/")[-2]),str("out_"+str(sys.argv[1].split("/")[-1])))
+        print("IT WAS SAVED : ",dir_path)
         
         try : 
             f = open(dir_path, "x") 
