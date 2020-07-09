@@ -15,7 +15,7 @@ from scipy import signal
 
 debug = False;
 clusteringDebug = False
-#'''
+'''
 debug = True;
 clusteringDebug = True
 #'''
@@ -121,8 +121,20 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
         df['value'] = _isOn
         df['localSum'] = _localSum
         dir_path = os.path.dirname(os.path.realpath(__file__))
+        dir_path =""
+        
+        tmp =  sys.argv[1].split("/")[:-1]
+       
+      
+        for _part in tmp : 
+            print(_part)
+            print("----")
+            dir_path=dir_path+"/"+_part
+        dir_path=dir_path[1:]
+
         #dir_path = os.path.join(dir_path, "export_dataframe.csv") 
-        dir_path = os.path.join(dir_path,str(sys.argv[1].split("/")[-2]),str("out_"+str(sys.argv[1].split("/")[-1])))
+        #dir_path = os.path.join(dir_path,str(sys.argv[1].split("/")[-2]),str("out_"+str(sys.argv[1].split("/")[-1])))
+        dir_path = os.path.join(dir_path,str("out_"+str(sys.argv[1].split("/")[-1])))
         print("IT WAS SAVED : ",dir_path)
         
         try : 
