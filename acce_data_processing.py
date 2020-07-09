@@ -238,8 +238,8 @@ if  loaded :#Checks if the file was loaded correctly
 
     if(lengthInMinutes <0):
         #timeStamp = np.flip(timeStamp)
-        #data = np.flip(data)
         print("flipped")
+        data = np.flip(data)
         lengthInMinutes = int((timeStamp[0]-timeStamp[len(timeStamp)-1]).total_seconds()//60)#Calculates the interval in minutes
     
     print("---"*10)
