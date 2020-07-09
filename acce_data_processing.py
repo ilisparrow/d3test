@@ -54,6 +54,10 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
 
         threeAxisMerged = signal.medfilt(threeAxisMerged,3)
         
+        if(len(threeAxisMerged)<500):
+            print("Data array too small, less than 5 minutes")
+            return False,0,0
+
         if (debug):
             plt.plot(threeAxisMerged)
 
@@ -115,7 +119,6 @@ def sglProcessing(_sgl,_smoothingWindow=300):
 
 def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the same folder as the script
     
-    if True:
     try:
 
         df = pd.DataFrame(data=_newStampTime, columns=["date"])
@@ -125,8 +128,11 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
         #dir_path = os.path.join(dir_path, "export_dataframe.csv") 
         dir_path = os.path.join(dir_path,"out" ,str("out_"+str(sys.argv[1])))
         
-        f = open(dir_path, "x") 
-        f.close()
+        try : 
+            f = open(dir_path, "x") 
+            f.close()
+        except : 
+            print("File already exists")
 
         df.to_csv (dir_path, index = False, header=True)
         if (debug):
