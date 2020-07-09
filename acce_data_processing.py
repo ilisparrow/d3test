@@ -15,7 +15,7 @@ from scipy import signal
 
 debug = False;
 clusteringDebug = False
-'''
+#'''
 debug = True;
 clusteringDebug = True
 #'''
@@ -58,10 +58,7 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
             print("Data array too small, less than 5 minutes")
             return False,0,0
 
-        if (debug):
-            plt.plot(threeAxisMerged)
 
-            plt.show()
         return True,threeAxisMerged,timeStamp
 
     except Exception as e: 
@@ -87,7 +84,6 @@ def sglProcessing(_sgl,_smoothingWindow=300):
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
     if (debug):
         plt.plot(npAccCentered)
-        plt.show()
         plt.plot(npAccZFiltered)
         plt.show()
 
@@ -203,7 +199,7 @@ if(debug):
 
 loaded,data,timeStamp = loadFile('./tmp/data.csv')
 #smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
-smoothingWindow =50#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+smoothingWindow =100#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 #threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values !!!!!!!!!!!!!!IS OBSELETE, IT'S NOW DYNAMIC
 
 if  loaded :#Checks if the file was loaded correctly
