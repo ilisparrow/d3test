@@ -74,17 +74,21 @@ def movingAverage(_a, _n) :
 def sglProcessing(_sgl,_smoothingWindow):
 
     npAccCentered = _sgl-np.mean(_sgl)#Centers the data around 0
-    npAccCentered = _sgl
+    #npAccCentered = _sgl
 
     
     npAccZqrd =np.abs(npAccCentered)#it's the equivalent of the absolut value (to make all of the data positive
-    #npAccZqrd =np.square(npAccZqrd)#it's the equivalent of the absolut value (to make all of the data positive
 
-    
+    npAccZqrd = npAccZqrd-np.mean(npAccZqrd)#Centers the data around 0
+    npAccZqrd =np.abs(npAccZqrd)#it's the equivalent of the absolut value (to make all of the data positive
+
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
+
     if (debug):
-        plt.plot(npAccCentered)
-        plt.plot(npAccZFiltered)
+        plt.plot(npAccCentered,label="Accel centered")
+        plt.plot(npAccZqrd,label="Accel Absolute")
+        plt.plot(npAccZFiltered,label="Accel Filtered")
+        plt.legend()
         plt.show()
 
 
@@ -216,14 +220,13 @@ if(debug):
 
 loaded,data,timeStamp = loadFile('./tmp/data.csv')
 #smoothingWindow = math.floor(np.size(timeStamp)*0.01)#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
-smoothingWindow =100#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
+smoothingWindow =150#TO CHECK : THe value 300 was chosen for 30 000 values, to check for less values
 #threshHold = 2000#TO CHECK : THe value 300 was chosen for a smoothening window of 300 values, to check for less values !!!!!!!!!!!!!!IS OBSELETE, IT'S NOW DYNAMIC
 
 if  loaded :#Checks if the file was loaded correctly
 
     
     resizedTimeStamp = timeStamp[smoothingWindow-1:]#Calculates the size of the array after the filter is applied
-    #threshHold = np.mean(processed)*0.8
 
     
     '''
@@ -293,9 +296,6 @@ if  loaded :#Checks if the file was loaded correctly
     
     #OBS : IT doesn't work for only off machine, if the filtering window is not put to 300 (the singal is too noisy, and the algorithm thinks that there are two catogires
     
-    #TODO : Change the Filter for something smarter
-    #TODO : forgot :/ 
-    #TODO : Not fit(x) eveyrthime we have a request, but do it once, as setup procedure (an automatic one), then just "predict"
 
     
     
