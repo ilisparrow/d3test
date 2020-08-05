@@ -13,7 +13,7 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from scipy import signal
 #'''
 
-debug = False;
+debug = False
 clusteringDebug = False
 '''
 debug = True;
@@ -162,9 +162,8 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 def clustering(_smoothingWindow,_raw):
 
     
-    #_raw = _raw[:500]#Calls the processing function#FOR DEBUG, SINGAL WHEN, THESE IS DATA FROM WHEN THE MACHINE IS NOT RUNNNING
     X = sglProcessing(_raw, _smoothingWindow)#Calls the processing function
-
+    
     X = np.reshape(X, (-1, 1))
     bandwidth = estimate_bandwidth(X, quantile=0.5,n_samples=500)
 
@@ -181,6 +180,13 @@ def clustering(_smoothingWindow,_raw):
     boolArray = (np.invert(labels == labels[np.argmin(X)]))*1
     boolArray = signal.medfilt(boolArray,9)
 
+    #Check if there is One cluster, check if the cluster is a 0, if so send back zeros, else send 1
+    if len(labels_unique) == 1:
+        if (np.mean(X)<0.2):#if th eaverage of the sensor data is close to 0
+            boolArray = np.zeros(np.size(boolArray))
+        else:
+            boolArray = np.ones(np.size(boolArray))
+
     if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
         print("Cluster centers : ", ms.cluster_centers_)
@@ -192,7 +198,6 @@ def clustering(_smoothingWindow,_raw):
         plt.title("Filtered in blue, in Orange is the  clustured output")
         plt.show()
    
-    #return (X>30)*1#Applies the threshold, and transforms it into 1 & 0 !!!!!!!!! IS OBSELETE, IT'S NOW DYNAMIC
     return boolArray
 
 
