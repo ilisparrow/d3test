@@ -15,7 +15,7 @@ from scipy import signal
 
 debug = False
 clusteringDebug = False
-'''
+#'''
 debug = True;
 clusteringDebug = True
 #'''
@@ -66,19 +66,19 @@ def loadFile(_name) : #Returns a [bool : If it loaded the file, data : np array 
         print(e)
         return False,0,0
     
-def movingAverage(_a, _n=300) :
+def movingAverage(_a, _n) :
     ret = np.cumsum(_a, dtype=float)
     ret[_n:] = ret[_n:] - ret[:-_n]
     return ret[_n - 1:] / _n    
     
-def sglProcessing(_sgl,_smoothingWindow=300):
+def sglProcessing(_sgl,_smoothingWindow):
 
     npAccCentered = _sgl-np.mean(_sgl)#Centers the data around 0
+    npAccCentered = _sgl
 
-    if (debug):
-        plt.plot(npAccCentered)
     
-    npAccZqrd =(np.abs(npAccCentered))#it's the equivalent of the absolut value (to make all of the data positive
+    npAccZqrd =np.abs(npAccCentered)#it's the equivalent of the absolut value (to make all of the data positive
+    #npAccZqrd =np.square(npAccZqrd)#it's the equivalent of the absolut value (to make all of the data positive
 
     
     npAccZFiltered = movingAverage(npAccZqrd,_smoothingWindow)#Low pass filter (averaging over a 300 elment window)
@@ -192,7 +192,7 @@ def clustering(_smoothingWindow,_raw):
         print("Cluster centers : ", ms.cluster_centers_)
         #Input singal
         #plt.plot((_raw[(_smoothingWindow//2):]-np.mean(_raw[(_smoothingWindow//2):]))*1,color="gray")
-        plt.plot(X/50,color="orange")
+        plt.plot(X,color="orange")
         plt.plot(boolArray,color="red")
         #plt.plot((X>2000)*100)
         plt.title("Filtered in blue, in Orange is the  clustured output")
