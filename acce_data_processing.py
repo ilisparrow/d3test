@@ -15,7 +15,7 @@ from scipy import signal
 
 debug = False
 clusteringDebug = False
-#'''
+'''
 debug = True;
 clusteringDebug = True
 #'''
@@ -165,8 +165,9 @@ def writToFile(_isOn, _newStampTime,_localSum):#Writes into a CSV file in the sa
 
 def clustering(_smoothingWindow,_raw):
 
-    
+     
     X = sglProcessing(_raw, _smoothingWindow)#Calls the processing function
+    #X = sglProcessing(np.append(_raw[:3000],_raw[51000:54000]), _smoothingWindow)#Calls the processing function
     
     X = np.reshape(X, (-1, 1))
     bandwidth = estimate_bandwidth(X, quantile=0.5,n_samples=500)
@@ -190,6 +191,9 @@ def clustering(_smoothingWindow,_raw):
             boolArray = np.zeros(np.size(boolArray))
         else:
             boolArray = np.ones(np.size(boolArray))
+
+
+
 
     if(clusteringDebug):
         print("Number of estimated clusters : %d" % n_clusters_)
